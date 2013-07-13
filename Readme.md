@@ -3,6 +3,10 @@
 
   engine.io websocket server for use with [io](http://github.com/matthewmueller/io).
 
+## Installation
+
+    npm install io-server
+
 ## Design
 
 ### Pooling
