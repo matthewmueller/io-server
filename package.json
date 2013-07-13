@@ -5,7 +5,6 @@
   "keywords": [],
   "author": "matthew mueller <mattmuelle@gmail.com>",
   "dependencies": {
-    "engine.io": "~0.6.3",
     "emitter-component": "~1.0.1"
   },
   "devDependencies": {

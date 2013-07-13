@@ -19,6 +19,17 @@ module.exports = IO;
 Emitter(IO);
 
 /**
+ * Overwrite IO.emit
+ */
+
+IO.emit = function(event, json, socket) {
+  var listeners = IO.listeners(event);
+  for(var i = 0, listener; listener = listeners[i]; i++) {
+    listener.call(socket, json);
+  }
+};
+
+/**
  * Clients
  */
 
@@ -63,7 +74,7 @@ IO.prototype.message = function(message) {
   if (!event) return this;
 
   if (IO.hasListeners(event)) {
-    return IO.emit.call(this, json, this);
+    IO.emit(event, json, this);
   } else {
     this.broadcast(json);
   }
