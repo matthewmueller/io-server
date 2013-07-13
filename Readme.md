@@ -1,7 +1,7 @@
 
 # IO-server
 
-  IO-server for use with [io](http://github.com/matthewmueller/io).
+  engine.io websocket server for use with [io](http://github.com/matthewmueller/io).
 
 ## Design
 
