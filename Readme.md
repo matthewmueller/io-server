@@ -7,7 +7,7 @@
 
     npm install io-server
 
-## Design
+## Features
 
 ### Pooling
 
