@@ -40,7 +40,16 @@ IO.on('signup', function(json) {
 
 ### Authentication
 
-Authentication is delegated to the middleware level of express. You can stack authentication or validation middleware before engine.io handles the request. See the example below for more information.
+Authentication is delegated to the middleware level of express. You can stack authentication or validation middleware before engine.io handles the request.
+
+```js
+app.configure(function() {
+  app.use(express.query());
+  app.use(auth);
+  app.use(validate);
+  app.use('/engine.io', es.handleRequest.bind(es));
+});
+```
 
 ## Example
 
