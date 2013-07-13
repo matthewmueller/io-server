@@ -11,7 +11,7 @@
 
 ### Pooling
 
-IO-server supports URL-based pooling. For example:
+IO-server supports URL-based pooling. For example on the client-side:
 
 ```js
 IO.connect('/app/a/1') // gets events from sockets connected to: /app/a/1
