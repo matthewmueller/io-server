@@ -39,13 +39,17 @@ var clients = [];
  * Initialize `IO`
  */
 
-function IO(socket, channel) {
-  if (!(this instanceof IO)) return new IO(socket, channel);
+function IO(socket, opts) {
+  if (!(this instanceof IO)) return new IO(socket, opts);
+  opts = opts || {};
   this.socket = socket;
-  this.$channel = channel;
+  this.$channel = opts.channel;
+  var path = this.path = opts.path;
 
-  var req = socket.transport.request;
-  var path = this.path = req.query.pathname;
+  if (!path) {
+    var req = socket.transport.request;
+    path = this.path = req.query.pathname || '/';
+  }
 
   // if we already have socket, return immediately
   if (~clients.indexOf(socket)) return;
@@ -126,5 +130,8 @@ IO.prototype.broadcast = function(json) {
  */
 
 IO.prototype.channel = function(channel) {
-  return new IO(this.socket, channel);
+  return new IO(this.socket, {
+    channel: channel,
+    path: this.path
+  });
 };
