@@ -22,10 +22,10 @@ Emitter(IO);
  * Overwrite IO.emit
  */
 
-IO.emit = function(event, json, socket) {
+IO.emit = function(event, message, socket) {
   var listeners = IO.listeners(event);
   for(var i = 0, listener; listener = listeners[i]; i++) {
-    listener.call(socket, json);
+    listener.apply(socket, message);
   }
 };
 
@@ -39,12 +39,16 @@ var clients = [];
  * Initialize `IO`
  */
 
-function IO(socket) {
-  if (!(this instanceof IO)) return new IO(socket);
+function IO(socket, channel) {
+  if (!(this instanceof IO)) return new IO(socket, channel);
   this.socket = socket;
+  this.$channel = channel;
 
   var req = socket.transport.request;
   var path = this.path = req.query.pathname;
+
+  // if we already have socket, return immediately
+  if (~clients.indexOf(socket)) return;
 
   if (path) pool.push(path, socket);
   clients.push(socket);
@@ -55,6 +59,8 @@ function IO(socket) {
   // cleanup
   socket.on('close', function() {
     pool.remove(path, socket);
+    var i = clients.indexOf(socket);
+    if (~i) clients.splice(i, 1);
   });
 }
 
@@ -66,17 +72,19 @@ function IO(socket) {
  */
 
 IO.prototype.message = function(message) {
-  var self = this;
-  var args = slice.call(arguments);
   var json = JSON.parse(message);
-  var event = json.event;
-  var path = this.path;
+  var event = json.$event;
   if (!event) return this;
+  var message = json.$message;
+  var channel = json.$channel;
+
+  // create new socket from channel if specified
+  var socket = (channel) ? this.channel(channel) : this;
 
   if (IO.hasListeners(event)) {
-    IO.emit(event, json, this);
+    IO.emit(event, message, socket);
   } else {
-    this.broadcast(json);
+    socket.broadcast(json);
   }
 };
 
@@ -84,9 +92,11 @@ IO.prototype.message = function(message) {
  * Send a message to socket
  */
 
-IO.prototype.emit = function(event, json) {
-  json = json || {};
-  json.event = event;
+IO.prototype.emit = function(event) {
+  var json = json || {};
+  json.$event = event;
+  json.$message = slice.call(arguments, 1);
+  if (this.$channel) json.$channel = this.$channel;
   this.broadcast(json);
   return this;
 };
@@ -96,8 +106,8 @@ IO.prototype.emit = function(event, json) {
  */
 
 IO.prototype.broadcast = function(json) {
-  var path = this.path;
   var message = JSON.stringify(json);
+  var path = this.path;
 
   // either pull from pool or send to all
   var sockets = (path) ? pool.pull(path) : clients;
@@ -107,4 +117,14 @@ IO.prototype.broadcast = function(json) {
   }
 
   return this;
+};
+
+/**
+ * Create a channel
+ *
+ * @api private
+ */
+
+IO.prototype.channel = function(channel) {
+  return new IO(this.socket, channel);
 };
