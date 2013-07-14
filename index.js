@@ -93,7 +93,7 @@ IO.prototype.message = function(message) {
  */
 
 IO.prototype.emit = function(event) {
-  var json = json || {};
+  var json = {};
   json.$event = event;
   json.$message = slice.call(arguments, 1);
   if (this.$channel) json.$channel = this.$channel;
