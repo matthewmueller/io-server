@@ -85,6 +85,7 @@ IO.prototype.message = function(message) {
  */
 
 IO.prototype.emit = function(event, json) {
+  json = json || {};
   json.event = event;
   this.broadcast(json);
   return this;
