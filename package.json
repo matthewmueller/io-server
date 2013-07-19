@@ -1,6 +1,6 @@
 {
   "name": "io-server",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "io server to use with matthewmueller/io",
   "keywords": [],
   "author": "matthew mueller <mattmuelle@gmail.com>",
